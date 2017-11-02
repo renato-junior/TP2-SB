@@ -19,6 +19,8 @@
  ******************************************************************************/
 #include "msp430g2553.h"
 
+unsigned int flag = 0;
+
 void main(void)
 {
     WDTCTL = WDTPW + WDTHOLD; // Desliga Watchdog timer
@@ -38,5 +40,13 @@ void main(void)
 #pragma vector = TIMER0_A0_VECTOR
 __interrupt void Timer_A(void)
 {
-    P1OUT = P1OUT ^ 0x01; // Inverte saida no pino 1.0 com ou-exclusivo
+    if(flag == 0){
+        P1OUT = P1OUT ^ 0x01; // Inverte saida no pino 1.0 com ou-exclusivo
+        flag = 1;
+    } else if(flag == 1){
+        P1OUT = P1OUT ^ 0x01; // Inverte saida no pino 1.0 com ou-exclusivo
+        flag = 2;
+    } else if(flag == 2){
+        flag = 0;
+    }
 }

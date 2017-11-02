@@ -1,22 +1,3 @@
-/******************************************************************************
- *                   UNIVERSIDADE FEDERAL DE MINAS GERAIS                     *
- *                      ESCOLA DE VERÃO EM COMPUTAÇÃO                         *
- ******************************************************************************
- *                      MINICURSO SISTEMAS EMBARCADOS                         *
- *             PROF. JOSÉ AUGUSTO MIRANDA NACIF - JNACIF@UFV.BR               *
- *                        PRÁTICA #3 - TEMPORIZADOR                           *
- ******************************************************************************
- *                          DESCRIÇÃO DO EXEMPLO                              *
- *     O exemplo  configura  o Timer A para gerar uma interrupção periódica a *
- * cada 1 segundo. Quando a rotina de tratamento de interrupção é  executada, *
- * o valor do LED vermelho (P1.0) é invertido.                                *
- ******************************************************************************
- *                        ATIVIDADE PRÁTICA PROPOSTA                          *
- *     Altere o exemplo, utilizando o temporizador para simular um  semafóro, * 
- * no qual:                                                                   *
- * - O LED vermelho (P1.0) permaneça ativado por 10 segundos                  *
- * - O LED verde (P1.6) permaneça ativado por 20 segundos                     *
- ******************************************************************************/
 #include "msp430g2553.h"
 
 unsigned int flag = 0;

@@ -5,16 +5,18 @@ unsigned int count = 0;
 void main(void)
 {
     WDTCTL = WDTPW + WDTHOLD; // Desliga Watchdog timer
-    P1DIR = 0x01 + 0x40;      // Define pinos 1.0 e 1.6 como sa�da (0100 0001)
+    P1DIR = 0x01 + 0x40;      // Define pinos 1.0 e 1.6 como saída (0100 0001)
     P1REN = 0x08;             // Habilita pullup/pulldown do pino 1.3 (0000 1000)
     P1OUT = 0x08;             // Define pullup para o pino 1.3 (0000 1000)
+    P1IE = 0x08;               // Habilita interrupção no pino 1.3 (00001000)
+    P1IFG = 0x00;              // Zera flag de interrupção da porta 1 (00000000)
     P1OUT |= 0x40; // Seta o valor do LED verde para 1, ligando-o
     P1OUT &= 0xfe; // Seta o valor do LED vermelho para 0, desligando-o
 
-    CCTL0 = CCIE;                   // Habilita interrup��o de compara��o do timer A
+    CCTL0 = CCIE;                   // Habilita interrupção de comparação do timer A
     TACTL = TASSEL_2 + MC_3 + ID_3; // SMCLK = 1 MHz, SMCLK/8 = 125 KHz (8 us)
     CCR0 = 62500;                   // Modo up/down: chega no valor e depois volta
-                                    // para zero, portanto cada interrup��o acontece
+                                    // para zero, portanto cada interrupção acontece
                                     // 2 * 62500 * 8 us = 1 segundo
     _BIS_SR(CPUOFF + GIE);
     while (1);
@@ -38,4 +40,15 @@ __interrupt void Timer_A(void)
         P1OUT &= 0xfe; // Desativa o LED vermelho
         count = 0;
     }
+}
+
+#pragma vector=PORT1_VECTOR  // Rotina de tratamento de interrupção da porta 1
+__interrupt void Port_1(void) {
+   __delay_cycles(100000);   // Gera um atraso 
+   
+    if(count < 5){
+        count = count + 5;
+    }
+
+   P1IFG = 0x00;             // Zera flag de interrupção da porta 1 (00000000)
 }

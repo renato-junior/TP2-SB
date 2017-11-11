@@ -24,10 +24,30 @@
   asm volatile ( /*TODO*/
                  "push r4  \n\t" \
                  "push r5  \n\t" \
+                 "push r6  \n\t" \
+                 "push r7  \n\t" \
+                 "push r8  \n\t" \
+                 "push r9  \n\t" \
+                 "push r10  \n\t" \
+                 "push r11  \n\t" \
+                 "push r12  \n\t" \
+                 "push r13  \n\t" \
+                 "push r14  \n\t" \
+                 "push r15  \n\t" \
                );
 
 #define RESTORE_CONTEXT()       \
   asm volatile ( /*TODO*/
+                 "pop r15  \n\t" \
+                 "pop r14  \n\t" \
+                 "pop r13  \n\t" \
+                 "pop r12  \n\t" \
+                 "pop r11  \n\t" \
+                 "pop r10  \n\t" \
+                 "pop r9  \n\t" \
+                 "pop r8  \n\t" \
+                 "pop r7  \n\t" \
+                 "pop r6  \n\t" \
                  "pop r5  \n\t" \
                  "pop r4  \n\t" \
                  "reti    \n\t" \
@@ -105,8 +125,8 @@ void main(void)
   /*initialise stack for each task*/
   stack_pointer[0] = initialise_stack(task1, &task1ram[STACK_TOP]); // initialize stack 0
   /*TODO*/
-  // initialize stack 1
-  // initialize stack 2
+  stack_pointer[0] = initialise_stack(task2, &task2ram[STACK_TOP]); // initialize stack 1
+  stack_pointer[0] = initialise_stack(task2, &task3ram[STACK_TOP]); // initialize stack 2
   
 
   CCTL0 = CCIE;               // Habilita interrupção de comparação do timer A           
@@ -139,4 +159,8 @@ __interrupt void Timer_A (void)
 
   //4 Load Context 
   
+  SAVE_CONTEXT();
+  
+  LOAD_STACK_POINTER(temp);  
+
 }

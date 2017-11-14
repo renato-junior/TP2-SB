@@ -5,7 +5,7 @@
 
 #define STACK_SIZE  50
 #define STACK_TOP   STACK_SIZE - 1   
-#define TOTAL_TASKS 2 /*TODO*/
+#define TOTAL_TASKS 2
 
 #define LOAD_STACK_POINTER(temp) \
     __asm__ volatile ("mov.w r1, %0 \n\t" \
@@ -21,7 +21,7 @@
 #define DEFAULT_SR  ((uint16_t)0x0048) 
 
 #define SAVE_CONTEXT()           \
-  asm volatile ( /*TODO*/
+  asm volatile (
                  "push r4  \n\t" \
                  "push r5  \n\t" \
                  "push r6  \n\t" \
@@ -37,7 +37,7 @@
                );
 
 #define RESTORE_CONTEXT()       \
-  asm volatile ( /*TODO*/
+  asm volatile (
                  "pop r15  \n\t" \
                  "pop r14  \n\t" \
                  "pop r13  \n\t" \
@@ -68,12 +68,26 @@ volatile uint8_t button1 = 0x1, button2=0x1; /*volatile since its a shared resou
 
 void task1(void)
 { 
-/*TODO*/
+
+  volatile unsigned int count = task1ram[stack_pointer[0]+1];
+  count++;
+  if(count == 2){
+    P1OUT = P1OUT ^ 0x01; //Inverte vermelho
+    count = 0;
+  }
+  task1ram[stack_pointer[0]+1] = count;
+
 }
 
 void task2(void)
 {
-/*TODO*/
+  volatile unsigned int count = task2ram[stack_pointer[1]+1];
+  count++;
+  if(count == 10){
+    P1OUT = P1OUT ^ 0x40; //Inverte verde
+    count = 0;
+  }
+  task2ram[stack_pointer[1]+1] = count;
 }
 
 void task3(void)
@@ -124,9 +138,8 @@ void main(void)
   
   /*initialise stack for each task*/
   stack_pointer[0] = initialise_stack(task1, &task1ram[STACK_TOP]); // initialize stack 0
-  /*TODO*/
-  stack_pointer[0] = initialise_stack(task2, &task2ram[STACK_TOP]); // initialize stack 1
-  stack_pointer[0] = initialise_stack(task2, &task3ram[STACK_TOP]); // initialize stack 2
+  stack_pointer[1] = initialise_stack(task2, &task2ram[STACK_TOP]); // initialize stack 1
+  stack_pointer[2] = initialise_stack(task3, &task3ram[STACK_TOP]); // initialize stack 2
   
 
   CCTL0 = CCIE;               // Habilita interrupção de comparação do timer A           
@@ -158,9 +171,26 @@ __interrupt void Timer_A (void)
   //3-Save Stack pointer
 
   //4 Load Context 
-  
+
   SAVE_CONTEXT();
+
+  LOAD_STACK_POINTER(temp);
+
+  stack_pointer[task_id] = temp;
+
+  if(task_id < (TOTAL_TASKS-1))
+  {
+    task_id++;
+  }
+  else
+  {
+    task_id = 0;
+  }
   
-  LOAD_STACK_POINTER(temp);  
+  temp = stack_pointer[task_id];
+
+  SAVE_STACK_POINTER(temp);
+
+  RESTORE_CONTEXT();
 
 }

@@ -66,26 +66,31 @@ volatile uint8_t button1 = 0x1, button2=0x1; /*volatile since its a shared resou
 
 void task1(void)
 { 
-
-  volatile unsigned int count = task1ram[*(stack_pointer[0])+1];
+  P1DIR = 0x01 + 0x40;  
+  volatile uint16_t count;
+  //Pega o valor de count que esta em R4
+  asm volatile("\t mov.w r4,%0" : "=r"(count));
   count++;
   if(count == 2){
     P1OUT = P1OUT ^ 0x01; //Inverte vermelho
     count = 0;
   }
-  task1ram[*(stack_pointer[0])+1] = count;
+  asm volatile("\t mov.w %0,r4" : "=r"(count));
 
 }
 
 void task2(void)
 {
-  volatile unsigned int count = task2ram[*(stack_pointer[1])+1];
+  P1DIR = 0x01 + 0x40;  
+  volatile uint16_t count;
+  //Pega o valor de count que esta em R4
+  asm volatile("\t mov.w r4,%0" : "=r"(count));
   count++;
   if(count == 10){
     P1OUT = P1OUT ^ 0x40; //Inverte verde
     count = 0;
   }
-  task2ram[*(stack_pointer[1])+1] = count;
+  asm volatile("\t mov.w %0,r4" : "=r"(count));
 }
 
 void task3(void)

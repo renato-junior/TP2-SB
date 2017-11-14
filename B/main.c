@@ -21,8 +21,7 @@
 #define DEFAULT_SR  ((uint16_t)0x0048) 
 
 #define SAVE_CONTEXT()           \
-  asm volatile (
-                 "push r4  \n\t" \
+  asm volatile ("push r4  \n\t" \
                  "push r5  \n\t" \
                  "push r6  \n\t" \
                  "push r7  \n\t" \
@@ -37,8 +36,7 @@
                );
 
 #define RESTORE_CONTEXT()       \
-  asm volatile (
-                 "pop r15  \n\t" \
+  asm volatile ("pop r15  \n\t" \
                  "pop r14  \n\t" \
                  "pop r13  \n\t" \
                  "pop r12  \n\t" \
@@ -69,25 +67,25 @@ volatile uint8_t button1 = 0x1, button2=0x1; /*volatile since its a shared resou
 void task1(void)
 { 
 
-  volatile unsigned int count = task1ram[stack_pointer[0]+1];
+  volatile unsigned int count = task1ram[*(stack_pointer[0])+1];
   count++;
   if(count == 2){
     P1OUT = P1OUT ^ 0x01; //Inverte vermelho
     count = 0;
   }
-  task1ram[stack_pointer[0]+1] = count;
+  task1ram[*(stack_pointer[0])+1] = count;
 
 }
 
 void task2(void)
 {
-  volatile unsigned int count = task2ram[stack_pointer[1]+1];
+  volatile unsigned int count = task2ram[*(stack_pointer[1])+1];
   count++;
   if(count == 10){
     P1OUT = P1OUT ^ 0x40; //Inverte verde
     count = 0;
   }
-  task2ram[stack_pointer[1]+1] = count;
+  task2ram[*(stack_pointer[1])+1] = count;
 }
 
 void task3(void)

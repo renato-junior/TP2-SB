@@ -69,28 +69,31 @@ void task1(void)
   P1DIR = 0x01 + 0x40;  
   volatile uint16_t count;
   //Pega o valor de count que esta em R4
-  asm volatile("\t mov.w r4,%0" : "=r"(count));
-  count++;
-  if(count == 2){
-    P1OUT = P1OUT ^ 0x01; //Inverte vermelho
-    count = 0;
+  while(1){
+    asm volatile("\t mov.w r4,%0" : "=r"(count));
+    count++;
+    if(count == 2){
+      P1OUT = P1OUT ^ 0x01; //Inverte vermelho
+      count = 0;
+    }
+    asm volatile("\t mov.w %0,r4" : "=r"(count));
   }
-  asm volatile("\t mov.w %0,r4" : "=r"(count));
-
 }
 
 void task2(void)
 {
   P1DIR = 0x01 + 0x40;  
   volatile uint16_t count;
-  //Pega o valor de count que esta em R4
-  asm volatile("\t mov.w r4,%0" : "=r"(count));
-  count++;
-  if(count == 10){
-    P1OUT = P1OUT ^ 0x40; //Inverte verde
-    count = 0;
+  while(1){
+    //Pega o valor de count que esta em R4
+    asm volatile("\t mov.w r5,%0" : "=r"(count));
+    count++;
+    if(count == 10){
+      P1OUT = P1OUT ^ 0x40; //Inverte verde
+      count = 0;
+    }
+    asm volatile("\t mov.w %0,r5" : "=r"(count));
   }
-  asm volatile("\t mov.w %0,r4" : "=r"(count));
 }
 
 void task3(void)

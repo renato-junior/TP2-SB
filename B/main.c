@@ -67,11 +67,13 @@ volatile uint8_t button1 = 0x1, button2=0x1; /*volatile since its a shared resou
 void task1(void)
 { 
   volatile uint16_t count;
+  volatile uint16_t lim; // para poder alternar quando a tarefa 3 for feita
   //Pega o valor de count que esta em R4
   while(1){
     asm volatile("\t mov.w r4,%0" : "=r"(count));
+    asm volatile("\t mov.w r5,%0" : "=r"(lim));
     count++;
-    if(count >= 1){
+    if(count >= lim){
       P1OUT = P1OUT ^ BIT0; //Inverte vermelho
       count = 0;
     }
@@ -82,21 +84,25 @@ void task1(void)
 void task2(void)
 {
   volatile uint16_t count1;
+  volatile uint16_t lim1; // para poder alternar quando a tarefa 3 for feita
   while(1){
     //Pega o valor de count que esta em R5
-    asm volatile("\t mov.w r5,%0" : "=r"(count1));
+    asm volatile("\t mov.w r6,%0" : "=r"(count1));
+    asm volatile("\t mov.w r7,%0" : "=r"(lim1));
     count1++;
-    if(count1 >= 5){
+    if(count1 >= lim1){
       P1OUT = P1OUT ^ BIT6; //Inverte verde
       count1 = 0;
     }
-    asm volatile("\t mov.w %0,r5" : "=r"(count1));
+    asm volatile("\t mov.w %0,r6" : "=r"(count1));
+    asm volatile("\t mov.w %0,r7" : "=r"(lim1));
   }
 }
 
 void task3(void)
 {
 /*TODO*/
+
 }
 
 

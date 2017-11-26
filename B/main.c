@@ -5,7 +5,7 @@
 
 #define STACK_SIZE  50
 #define STACK_TOP   STACK_SIZE - 1   
-#define TOTAL_TASKS 2
+#define TOTAL_TASKS 3
 
 #define LOAD_STACK_POINTER(temp) \
     __asm__ volatile ("mov.w r1, %0 \n\t" \
@@ -61,54 +61,64 @@ volatile uint8_t  task_id; /*has the current running task*/
 volatile uint16_t *stack_pointer[TOTAL_TASKS]; /*address of stack pointer for each task*/
 
 /*****************************************************/
-volatile uint8_t button1 = 0x1, button2=0x1; /*volatile since its a shared resource between tasks*/
+volatile uint8_t button1 = 0x1, button2=0x1, button3=0; /*volatile since its a shared resource between tasks*/
 /*****************************************************/
 
 void task1(void)
 { 
-  volatile uint16_t count;
-  volatile uint16_t lim; // para poder alternar quando a tarefa 3 for feita
-  //Pega o valor de count que esta em R4
+  volatile uint16_t i;
   while(1){
-    asm volatile("\t mov.w r4,%0" : "=r"(count));
-    asm volatile("\t mov.w r5,%0" : "=r"(lim));
-    count++;
-    if(count >= 2){
-      P1OUT = P1OUT ^ BIT0; //Inverte vermelho
-      count = 0;
+    if(button1){//2s
+      for (i=0; i < 65535; i++);
+      for (i=0; i < 65535; i++);
+    } else {//10s
+      for (i=0; i < 65535; i++);
+      for (i=0; i < 65535; i++);
+      for (i=0; i < 65535; i++);
+      for (i=0; i < 65535; i++);
+      for (i=0; i < 65535; i++);
+      for (i=0; i < 65535; i++);
+      for (i=0; i < 65535; i++);
+      for (i=0; i < 65535; i++);
+      for (i=0; i < 65535; i++);
+      for (i=0; i < 65535; i++);
     }
-    asm volatile("\t mov.w %0,r4" : "=r"(count));
-    asm volatile("\t mov.w %0,r5" : "=r"(lim));
+    P1OUT = P1OUT ^ 0x01; //Inverte vermelho
   }
 }
 
 void task2(void)
 {
-  volatile uint16_t count1;
-  volatile uint16_t lim1; // para poder alternar quando a tarefa 3 for feita
+  volatile uint16_t i;
   while(1){
-    //Pega o valor de count que esta em R5
-    asm volatile("\t mov.w r6,%0" : "=r"(count1));
-    asm volatile("\t mov.w r7,%0" : "=r"(lim1));
-    count1++;
-    if(count1 >= 10){
-      P1OUT = P1OUT ^ BIT6; //Inverte verde
-      count1 = 0;
+    if(button2){//10s
+      for (i=0; i < 65535; i++);
+      for (i=0; i < 65535; i++);
+      for (i=0; i < 65535; i++);
+      for (i=0; i < 65535; i++);
+      for (i=0; i < 65535; i++);
+      for (i=0; i < 65535; i++);
+      for (i=0; i < 65535; i++);
+      for (i=0; i < 65535; i++);
+      for (i=0; i < 65535; i++);
+      for (i=0; i < 65535; i++);
+    } else {//2s
+      for (i=0; i < 65535; i++);
+      for (i=0; i < 65535; i++);
     }
-    asm volatile("\t mov.w %0,r6" : "=r"(count1));
-    asm volatile("\t mov.w %0,r7" : "=r"(lim1));
+    P1OUT = P1OUT ^ 0x40; //Inverte verde
   }
 }
 
 void task3(void)
 {
-    volatile uint16_t limTask1;
-    volatile uint16_t limTask2;
-    asm volatile("\t mov.w r5,%0": "=r"(limTask1)); // recebe o valor do limite do task 1
-    asm volatile("\t mov.w r7,%0": "=r"(limTask2)); // recebe o valor do limite do task 2
-
-    asm volatile("\t mov.w %0,r7" : "=r"(limTask1));
-    asm volatile("\t mov.w %0,r5" : "=r"(limTask2)); // inverte os valores
+  while(1){
+    if(button3){
+      button3 = 0;
+      button1 ^= 0x1;
+      button2 ^= 0x1;
+    }
+  }
 }
 
 
@@ -151,7 +161,12 @@ void main(void)
   //Stop the watchdog timer until we configure our scheduler
   WDTCTL = WDTPW + WDTHOLD;
   
-  P1DIR |= (BIT0|BIT6);
+  P1DIR = 0x01 + 0x40; 
+
+  P1REN = 0x08;             // Habilita pullup/pulldown do pino 1.3 (0000 1000)
+  P1OUT = 0x08;             // Define pullup para o pino 1.3 (0000 1000)
+  P1IE = 0x08;               // Habilita interrupção no pino 1.3 (00001000)
+  P1IFG = 0x00;              // Zera flag de interrupção da porta 1 (00000000)
  
   
   /*initialise stack for each task*/
@@ -177,7 +192,7 @@ void main(void)
 }
 
 #pragma vector=TIMER0_A0_VECTOR
-__interrupt void Timer_A (void)
+__interrupt void __attribute__((naked)) Timer_A (void)
 {
 
   //0 -Save Context 
@@ -211,4 +226,13 @@ __interrupt void Timer_A (void)
 
   RESTORE_CONTEXT();
 
+}
+
+#pragma vector=PORT1_VECTOR  // Rotina de tratamento de interrupção da porta 1
+__interrupt void Port_1(void) {
+   __delay_cycles(100000);   // Gera um atraso 
+   
+    button3 = 0x1;
+
+   P1IFG = 0x00;             // Zera flag de interrupção da porta 1 (00000000)
 }

@@ -73,11 +73,12 @@ void task1(void)
     asm volatile("\t mov.w r4,%0" : "=r"(count));
     asm volatile("\t mov.w r5,%0" : "=r"(lim));
     count++;
-    if(count >= lim){
+    if(count >= 2){
       P1OUT = P1OUT ^ BIT0; //Inverte vermelho
       count = 0;
     }
     asm volatile("\t mov.w %0,r4" : "=r"(count));
+    asm volatile("\t mov.w %0,r5" : "=r"(lim));
   }
 }
 
@@ -90,7 +91,7 @@ void task2(void)
     asm volatile("\t mov.w r6,%0" : "=r"(count1));
     asm volatile("\t mov.w r7,%0" : "=r"(lim1));
     count1++;
-    if(count1 >= lim1){
+    if(count1 >= 10){
       P1OUT = P1OUT ^ BIT6; //Inverte verde
       count1 = 0;
     }
@@ -101,8 +102,13 @@ void task2(void)
 
 void task3(void)
 {
-/*TODO*/
+    volatile uint16_t limTask1;
+    volatile uint16_t limTask2;
+    asm volatile("\t mov.w r5,%0": "=r"(limTask1)); // recebe o valor do limite do task 1
+    asm volatile("\t mov.w r7,%0": "=r"(limTask2)); // recebe o valor do limite do task 2
 
+    asm volatile("\t mov.w %0,r7" : "=r"(limTask1));
+    asm volatile("\t mov.w %0,r5" : "=r"(limTask2)); // inverte os valores
 }
 
 

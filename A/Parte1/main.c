@@ -1,6 +1,6 @@
 #include "msp430g2553.h"
 
-unsigned int flag = 0;
+unsigned int count = 0;
 
 void main(void)
 {
@@ -21,13 +21,13 @@ void main(void)
 #pragma vector = TIMER0_A0_VECTOR
 __interrupt void Timer_A(void)
 {
-    if(flag == 0){
+    if(count == 0){
         P1OUT = P1OUT ^ 0x01; // Inverte saida no pino 1.0 com ou-exclusivo
-        flag = 1;
-    } else if(flag == 1){
+        count = 1;
+    } else if(count == 1){
         P1OUT = P1OUT ^ 0x01; // Inverte saida no pino 1.0 com ou-exclusivo
-        flag = 2;
-    } else if(flag == 2){
-        flag = 0;
+        count = 2;
+    } else if(count == 2){
+        count = 0;
     }
 }

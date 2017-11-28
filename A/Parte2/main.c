@@ -46,7 +46,7 @@ __interrupt void Timer_A(void)
 __interrupt void Port_1(void) {
    __delay_cycles(100000);   // Gera um atraso 
    
-    if(count < 5){
+    if(count <= 2){
         count = count + 5;
     }
 

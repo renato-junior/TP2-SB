@@ -1,2 +1,2 @@
 # TP2-SB
-É ou não é desesperador?
+Programas simples e um Escalonador para o MSP430.
